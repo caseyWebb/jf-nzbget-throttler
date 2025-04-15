@@ -38,14 +38,22 @@ class JellyfinNzbgetThrottler {
   }
 
   /**
-   * Stop the monitoring process
+   * Stop the monitoring process and reset download speed
+   * @returns Promise that resolves when speed has been reset
    */
-  stop(): void {
+  async stop(): Promise<void> {
     if (this.job) {
       this.job.cancel();
       this.job = null;
+      console.log("Monitoring stopped");
     }
-    console.log("Monitoring stopped");
+
+    // Reset NZBGet speed to default (unlimited)
+    try {
+      await this.nzbgetClient.setSpeedLimit(config.throttling.defaultSpeed);
+    } catch (error) {
+      console.error("Error resetting NZBGet speed:", error);
+    }
   }
 
   /**
@@ -122,16 +130,24 @@ class JellyfinNzbgetThrottler {
 const throttler = new JellyfinNzbgetThrottler();
 
 // Handle graceful shutdown
-process.on("SIGINT", () => {
+async function handleShutdown() {
   console.log("Shutting down...");
-  throttler.stop();
+  await throttler.stop();
   process.exit(0);
+}
+
+process.on("SIGINT", handleShutdown);
+process.on("SIGTERM", handleShutdown);
+
+// Handle unexpected errors
+process.on("uncaughtException", async (error) => {
+  console.error("Uncaught exception:", error);
+  await handleShutdown();
 });
 
-process.on("SIGTERM", () => {
-  console.log("Shutting down...");
-  throttler.stop();
-  process.exit(0);
+process.on("unhandledRejection", async (reason) => {
+  console.error("Unhandled rejection:", reason);
+  await handleShutdown();
 });
 
 // Start the throttler
