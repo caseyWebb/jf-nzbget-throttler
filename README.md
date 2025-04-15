@@ -25,12 +25,6 @@ This utility connects to a Jellyfin server and an NZBGet server to balance bandw
 
 ## Installation
 
-### Prerequisites
-
-- Node.js 18+ and npm
-- A running Jellyfin server with API access
-- A running NZBGet server
-
 ### Local Installation
 
 1. Clone the repository
@@ -74,14 +68,25 @@ This utility connects to a Jellyfin server and an NZBGet server to balance bandw
 
 ### Docker Installation
 
-1. Create a docker-compose.yml file (or use the one provided)
+Add the following to your `docker-compose.yml` file:
 
-2. Update the environment variables in the docker-compose.yml file
-
-3. Build and start the container
-   ```bash
-   docker-compose up -d
-   ```
+```yaml
+services:
+  jf-nzbget-throttler:
+    image: ghcr.io/caseyWebb/jf-nzbget-throttler:latest
+    container_name: jf-nzbget-throttler
+    restart: unless-stopped
+    environment:
+      - JELLYFIN_URL=http://jellyfin:8096
+      - JELLYFIN_API_KEY=your_jellyfin_api_key
+      - NZBGET_URL=http://nzbget:6789
+      - NZBGET_USERNAME=nzbget
+      - NZBGET_PASSWORD=tegbzn6789
+      - DEFAULT_SPEED=0
+      - CHECK_INTERVAL=30
+      - MAX_CONNECTION_SPEED=125000
+      - BUFFER_PERCENTAGE=20
+```
 
 ## Configuration
 
