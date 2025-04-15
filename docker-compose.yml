@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  jf-nzbget-throttler:
+    build: .
+    container_name: jf-nzbget-throttler
+    restart: unless-stopped
+    environment:
+      - JELLYFIN_URL=http://jellyfin:8096
+      - JELLYFIN_API_KEY=your_jellyfin_api_key
+      - NZBGET_URL=http://nzbget:6789
+      - NZBGET_USERNAME=nzbget
+      - NZBGET_PASSWORD=tegbzn6789
+      - DEFAULT_SPEED=0
+      - CHECK_INTERVAL=30
+      - MAX_CONNECTION_SPEED=125000
+      - BUFFER_PERCENTAGE=20
+    networks:
+      - media_network
+
+networks:
+  media_network:
+    external: true
