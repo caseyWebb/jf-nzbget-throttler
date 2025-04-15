@@ -176,7 +176,11 @@ export class JellyfinClient {
     return activeStreams
       .map(
         ({ session, estimatedBitrate }) =>
-          `- ${session.UserName} is playing ${session.NowPlayingItem?.Name} on ${session.DeviceName} (estimated ${estimatedBitrate} KB/s)`,
+          `- ${session.UserName} is playing ${
+            session.NowPlayingItem?.Type === "Episode"
+              ? `"${(session.NowPlayingItem as any).SeriesName || "Unknown Series"} - `
+              : '"'
+          }${session.NowPlayingItem?.Name}" on ${session.DeviceName} (estimated ${estimatedBitrate} KB/s)`,
       )
       .join("\n");
   }
